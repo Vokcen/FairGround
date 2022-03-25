@@ -9,7 +9,15 @@ namespace LeaptMultiplayer
 {
     public class GameManager : MonoBehaviourPunCallbacks
 {
-      
+        [SerializeField] private GameObject playerPrefab;
+
+
+
+        private void Start()
+        {
+            PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity);
+        }
+
         #region Public Methods
 
         public void LeaveRoom()
@@ -26,7 +34,7 @@ namespace LeaptMultiplayer
                 Debug.LogError("MasterClient deðilsen yapamazsýn");
             }
             Debug.LogFormat("PhotonNetwork : LoadingLevel : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
-            PhotonNetwork.LoadLevel("Room for " + PhotonNetwork.CurrentRoom.PlayerCount);
+            PhotonNetwork.LoadLevel("Game");
         }
         #endregion
         #region Photon CallBacks

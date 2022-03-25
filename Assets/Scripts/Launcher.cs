@@ -89,7 +89,7 @@ namespace LeaptMultiplayer
 
                 //#Kritik
                 //Load the Room Level
-                PhotonNetwork.LoadLevel("Room for 1");
+                PhotonNetwork.LoadLevel("Game");
             }
     }
 
