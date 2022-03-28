@@ -6,19 +6,30 @@ using Cinemachine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Move State")]
     public CharacterController controller;
     public float speed = 6f;
-    [SerializeField] Transform cam;
- [SerializeField]   CinemachineFreeLook cmLook;
-    PhotonView pv;
     public float turnSmoothTime = 0.1f;
     float turnSmoothVelocity;
+    [Space(20)]
+    [Header("Preset State")]
+    [SerializeField] Transform cam;
+    [SerializeField] CinemachineFreeLook cmLook;
+    PhotonView pv;
+    UiControl ui;
 
-    [SerializeField] Transform follow;
-    [SerializeField] Transform lookat;
+    //===============================================================
+    //Animstate
+    //===============================================================
+    [Space(20)]
+    [Header("Ani State")]
+    [SerializeField] Animator ani;
+    string AnimState;
+   
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+        ui = FindObjectOfType<UiControl>();
     }
     private void Start()
     {
@@ -28,8 +39,8 @@ public class PlayerMovement : MonoBehaviour
         
         cam = Camera.main.transform;
         cmLook = FindObjectOfType<CinemachineFreeLook>();
-        cmLook.Follow = follow;
-        cmLook.LookAt = lookat;
+        cmLook.Follow = transform;
+        cmLook.LookAt = transform;
         if (pv.IsMine)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -41,7 +52,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!pv.IsMine) return;
 
-        Move();
+
+        if (AnimState!="Sit")
+        {
+            Move();
+        }
+
+      
     }
 
     private void Move()
@@ -51,6 +68,8 @@ public class PlayerMovement : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
         if (direction.magnitude>=0.1f)
         {
+            ani.SetBool("isMove", true);
+            
             float targetAngle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg+cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity,turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -58,8 +77,101 @@ public class PlayerMovement : MonoBehaviour
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
 
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+               
+                ani.SetBool("isRun", true);
+                speed = 12;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                ani.SetBool("isRun", false);
+                speed = 6;
+            }
+        }
+        else
+        {
+            ani.SetBool("isMove", false);
+            ani.SetBool("isRun", false);
+        }
+
+        
+      
+    }
+    private void ToggleSitAnim(Collider other)
+    {
+       
+        Debug.Log("basýyon!");
+
+        if (AnimState!="Sit")
+        {
+            ui.gKeyPanel.SetActive(true);
+            ani.SetBool("isSit", true);
+            transform.rotation = other.gameObject.transform.rotation;
+           
+            AnimState = "Sit";
+        }
+        else
+        {
+
+            
+              
+                Debug.Log("basýyon!");
+                ani.SetBool("isSit", false);
+                AnimState = string.Empty;
+            ui.gKeyPanel.SetActive(false);
+
+        }
+
+
+
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+      
+  
+        if (other.gameObject.tag == "Sit") ui.fKeyPanel.SetActive(true);
+
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        bool currentState = ui.fKeyPanel.activeSelf;
+        if (!pv.IsMine) return;
+
+        if (other.gameObject.tag=="Sit")
+        { Debug.Log("<color=yellow>Oturabilir</color>");
+           
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                ui.fKeyPanel.SetActive(false);
+              
+                ToggleSitAnim(other);
+                StopCoroutine(fKeyTime());
+            }
+
+
+            //if (Input.GetKeyDown(KeyCode.G))
+            //{
+            //    ui.gKeyPanel.SetActive(true);
+            //    Debug.Log("basýyon!");
+            //    ani.SetBool("isSit", false);
+            //    AnimState = string.Empty;
+
+
+            //}
+            //else
+            //{
+            //    ui.gKeyPanel.SetActive(false);
+            //}
+
+
         }
     }
 
-
+   IEnumerator fKeyTime()
+    {
+       
+        yield return new WaitForSeconds(2);
+    }
 }

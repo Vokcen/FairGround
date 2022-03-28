@@ -15,7 +15,7 @@ namespace LeaptMultiplayer
 
         private void Start()
         {
-            PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity);
+            PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity);
         }
 
         #region Public Methods
@@ -28,13 +28,14 @@ namespace LeaptMultiplayer
 
         #region Private Methods
          void LoadArena()
-        {
+        {  PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity);
             if (!PhotonNetwork.IsMasterClient)
             {
                 Debug.LogError("MasterClient deðilsen yapamazsýn");
             }
             Debug.LogFormat("PhotonNetwork : LoadingLevel : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
             PhotonNetwork.LoadLevel("Game");
+          
         }
         #endregion
         #region Photon CallBacks
@@ -46,11 +47,13 @@ namespace LeaptMultiplayer
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
+          
             Debug.LogFormat("OnPlayerEnteredRoom() {0}", newPlayer.NickName);
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
                 LoadArena();
+
             }
         }
         public override void OnPlayerLeftRoom(Player otherPlayer)
