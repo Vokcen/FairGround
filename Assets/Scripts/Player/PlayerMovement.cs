@@ -34,9 +34,11 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         if (!pv.IsMine) return;
-       
 
+        ui.pointButton.onClick.AddListener(AnimatorBool);
         
+
+
         cam = Camera.main.transform;
         cmLook = FindObjectOfType<CinemachineFreeLook>();
         cmLook.Follow = transform;
@@ -55,12 +57,34 @@ public class PlayerMovement : MonoBehaviour
 
         if (AnimState!="Sit")
         {
+            
+            
             Move();
         }
-
+        else
+        {
+            SitAnimations();
+        }
       
     }
 
+    private void SitAnimations()
+    {
+     
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                ani.SetBool("Siting", true);
+            Cursor.lockState = CursorLockMode.None;
+                ui.emotePanel.SetActive(true);
+            }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+            ani.SetBool("Siting", false);
+            Cursor.lockState = CursorLockMode.Locked;
+                ui.emotePanel.SetActive(false) ;
+            }
+      
+    }
     private void Move()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -134,6 +158,10 @@ public class PlayerMovement : MonoBehaviour
         if (other.gameObject.tag == "Sit") ui.fKeyPanel.SetActive(true);
 
     }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Sit") ui.fKeyPanel.SetActive(false);
+    }
     private void OnTriggerStay(Collider other)
     {
         bool currentState = ui.fKeyPanel.activeSelf;
@@ -147,7 +175,7 @@ public class PlayerMovement : MonoBehaviour
                 ui.fKeyPanel.SetActive(false);
               
                 ToggleSitAnim(other);
-                StopCoroutine(fKeyTime());
+               
             }
 
 
@@ -169,9 +197,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-   IEnumerator fKeyTime()
+    public void AnimatorBool()
     {
-       
-        yield return new WaitForSeconds(2);
+        StartCoroutine(PointAnim());
     }
+    IEnumerator PointAnim()
+    {
+        ani.SetBool("isPointing", true);
+        yield return new WaitForSeconds(2f);
+        ani.SetBool("isPointing", false);
+    }
+
 }

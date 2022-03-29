@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class UiControl : MonoBehaviour
 {
@@ -8,15 +10,9 @@ public class UiControl : MonoBehaviour
 
   public GameObject fKeyPanel;
     public GameObject gKeyPanel;
-
-    public void GetFkeyPanel(bool value)
-    {
-        fKeyPanel.SetActive(value);
-    }
-    public void GetGkeyPanel(bool value)
-    {
-        gKeyPanel.SetActive(value);
-    }
+    public GameObject emotePanel;
+    public Button pointButton;
+   
 
 
 }
