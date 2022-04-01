@@ -12,7 +12,8 @@ public class UiControl : MonoBehaviour
     public GameObject gKeyPanel;
     public GameObject emotePanel;
     public Button pointButton;
-   
+    public GameObject virtualCam;
+    public GameObject freeLookCam;
 
 
 }

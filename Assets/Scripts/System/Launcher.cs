@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Realtime;
+using TMPro;
 namespace LeaptMultiplayer
 {
     public class Launcher : MonoBehaviourPunCallbacks
@@ -13,6 +14,7 @@ namespace LeaptMultiplayer
     [Tooltip("ODaya Katýlabilcek maksimum kullanýcý sayýsý")]
     [SerializeField]
     private byte maxPlayersPerRoom = 4;
+        [SerializeField] TMP_Text statusText; 
 
         /// <summary>
         /// Keep track of the current process. Since connection is asynchronous and is based on several callbacks from Photon,
@@ -67,6 +69,8 @@ namespace LeaptMultiplayer
     {
 
         Debug.Log("<color=green>Master'a Baðlanýldý</color>");
+            statusText.text = "Sunucuya Baðlanýldý Giriþ Yapýlýyor..." ;
+            statusText.color = Color.green;
             if (isConnecting)
             {
                 PhotonNetwork.JoinRandomRoom();
@@ -76,6 +80,8 @@ namespace LeaptMultiplayer
         public override void OnJoinRandomFailed(short returnCode, string message)
         {
             Debug.Log("Odaya katýlma baþarýsýz oldu Rastgele oda yok.Yeni oda oluþturuldu");
+            statusText.text = "Odaya katýlma baþarýsýz oldu Rastgele oda yok.Yeni oda oluþturuldu...";
+            statusText.color = Color.red;
             PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = maxPlayersPerRoom });
 
         }
@@ -83,6 +89,8 @@ namespace LeaptMultiplayer
     public override void OnJoinedRoom()
     { //#Critical : We only load if we are the first player, else we rely on 'photonnnetwork.autimatcasylysceneour instanse,
         Debug.Log("Odaya Katýlýndý");
+            statusText.text = "Odaya Giriþ yapýldý";
+            statusText.color = Color.green;
             if (PhotonNetwork.CurrentRoom.PlayerCount==1)
             {
                 Debug.Log("Oda 1 açýldý");

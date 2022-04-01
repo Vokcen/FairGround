@@ -52,7 +52,7 @@ namespace LeaptMultiplayer
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
-                LoadArena();
+             
 
             }
         }
@@ -65,7 +65,7 @@ namespace LeaptMultiplayer
                 Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}",
                     PhotonNetwork.IsMasterClient);
 
-                LoadArena();
+               
             }
 
 

@@ -6,17 +6,38 @@ using Cinemachine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    //===============================================================
+    //MovementState
+    //===============================================================
     [Header("Move State")]
     public CharacterController controller;
     public float speed = 6f;
     public float turnSmoothTime = 0.1f;
     float turnSmoothVelocity;
+
+    private Vector3 playerVelocity;
+    private bool groundedPlayer;
+
+    [SerializeField]
+    private float jumpHeight = 1.0f;
+    [SerializeField]
+    private float gravityValue = -9.81f;
+    //===============================================================
+    //SystemState
+    //===============================================================
     [Space(20)]
     [Header("Preset State")]
     [SerializeField] Transform cam;
-    [SerializeField] CinemachineFreeLook cmLook;
+    public CinemachineFreeLook cmLook;
+    CinemachineComponentBase componentBase;
+    float cameraDistance;
+   float sensivity=1500f;
+
+
     PhotonView pv;
     UiControl ui;
+
+
 
     //===============================================================
     //Animstate
@@ -52,14 +73,34 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
+       
+        if (Input.GetAxis("Mouse ScrollWheel") != 0)
+        {
+            Debug.Log("work");
+            cameraDistance = Input.GetAxis("Mouse ScrollWheel") * sensivity*Time.deltaTime;
+            cmLook.m_CommonLens = true;
+            
+            cmLook.m_Lens.FieldOfView -=cameraDistance;
+            cmLook.m_Lens.FieldOfView = Mathf.Clamp(cmLook.m_Lens.FieldOfView, 5, 60);
+            Debug.Log(cmLook.m_Lens.FieldOfView);
+            Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+        }
         if (!pv.IsMine) return;
 
+        
+
+        if (true)
+        {
+
+        }
 
         if (AnimState!="Sit")
         {
             
             
             Move();
+
+          
         }
         else
         {
@@ -87,6 +128,14 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Move()
     {
+        groundedPlayer = controller.isGrounded;
+        if (groundedPlayer && playerVelocity.y < 0)
+        {
+            playerVelocity.y = 0f;
+        }
+
+
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
@@ -119,9 +168,13 @@ public class PlayerMovement : MonoBehaviour
             ani.SetBool("isMove", false);
             ani.SetBool("isRun", false);
         }
+        // Changes the height position of the player..
+     
 
-        
-      
+        playerVelocity.y += gravityValue * Time.deltaTime;
+        controller.Move(playerVelocity * Time.deltaTime);
+
+
     }
     private void ToggleSitAnim(Collider other)
     {
@@ -204,6 +257,7 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator PointAnim()
     {
         ani.SetBool("isPointing", true);
+        ui.emotePanel.SetActive(false);
         yield return new WaitForSeconds(2f);
         ani.SetBool("isPointing", false);
     }
